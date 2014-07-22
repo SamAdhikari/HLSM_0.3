@@ -1,0 +1,22 @@
+useDynLib(HLSM)
+import("MASS", "coda")
+
+export("HLSM",
+       "HLSMfixedEF",
+       "plotDiagnostic",
+       "plotLikelihood",
+       "plotHLSM.random.fit",
+       "plotHLSM.fixed.fit",
+       "plotHLSM.LS",	
+       "print.HLSM",
+       "print.summary.HLSM",
+       "summary.HLSM",
+	"getBeta",
+	"getIntercept",
+	"getAlpha",
+	"getLS",
+	"getLikelihood")
+       
+
+S3method('print','HLSM')
+S3method('summary','HLSM')

@@ -1,0 +1,5 @@
+plotLikelihood = function(object,burnin = 0, thin = 1){
+    xx = getLikelihood(object, burnin = burnin, thin = thin)
+    plot(xx,type='l', main = 'Likelihood from MCMC draws')
+}
+

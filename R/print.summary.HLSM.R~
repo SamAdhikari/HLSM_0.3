@@ -1,0 +1,7 @@
+print.summary.HLSM = function(x,...){
+    cat("Call:\n")
+    print(x$call)
+    cat("\n")
+    print(x$acc)
+}
+

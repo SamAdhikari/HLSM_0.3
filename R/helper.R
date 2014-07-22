@@ -1,0 +1,45 @@
+getBeta = function(object, burnin = 0, thin = 1){
+	xx = object$draws$Beta
+	nn = dim(xx)[[1]]
+	dd=seq(burnin, nn, thin)
+	if(length(dim(xx)) == 3){ #for random effect model
+		return(xx[dd,,]) }
+	if(length(dim(xx)) == 2){  ##for fixed effect model
+		return(xx[dd,]) }
+}
+
+getIntercept = function(object, burnin = 0, thin = 1){
+	xx = object$draws$Intercept
+	if(class(xx) == 'matrix'){  ##for fixed effect model
+		nn = dim(xx)[[1]]
+		dd = seq(burnin, nn, thin)
+		return(xx[dd,]) 
+	}else{			#for random effect model
+		nn = length(xx)
+		dd = seq(burnin, nn, thin)
+		return(xx[dd])
+	}
+}
+
+getAlpha = function(object, burnin = 0, thin = 1){
+	xx = object$draws$Alpha
+	nn = length(xx)
+	dd = seq(burnin, nn, thin)
+	return(xx[dd]) 
+}
+
+getLS = function(object, burnin = 0, thin = 1){
+	xx = object$draws$ZZ
+	nn = dim(xx[[1]])[[3]]	
+	dd = seq(burnin,nn,thin)
+	return(lapply(1:length(xx),function(y)xx[[y]][,,dd]))
+}	
+
+getLikelihood = function(object, burnin = 0, thin = 1){
+	xx = object$draws$likelihood 
+	nn = length(xx)
+	dd = seq(burnin, nn, thin)
+	return(xx[dd]) 
+}
+
+

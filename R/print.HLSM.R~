@@ -1,0 +1,6 @@
+
+print.HLSM = function(object, ...){
+    cat("Call:\n")
+    print(object$call)
+}
+
