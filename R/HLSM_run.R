@@ -31,12 +31,18 @@ HLSMrandomEF = function(Y,edgeCov = NULL, receiverCov = NULL,senderCov =NULL,Ful
 	
     if(class(Y) == 'list'){ 
         KK = length(Y)
-	if(dim(Y[[1]])[1] == dim(Y[[1]])[2]){
-		nn =sapply(1:length(Y),function(x) nrow(Y[[x]])) }
+	check = 1
+	for(cc in 1:KK){
+	    check =  check *(dim(Y[[cc]])[1] == dim(Y[[cc]])[2])
+	}
+	if(check == 1){	
+	    nn =sapply(1:KK,function(x) nrow(Y[[x]])) 
+	    nodenames = lapply(1:KK,function(x) dimnames(Y[[x]])[[1]])
+		}
 
-	if(dim(Y[[1]])[1] != dim(Y[[1]])[2] & dim(Y[[1]])[2] == 4){
-		nn = sapply(1:length(Y), function(x)length(unique(c(Y[[x]]$Receiver,Y[[x]]$Sender))))
-		nodenames = lapply(1:length(Y), function(x) unique(c(Y[[x]]$Receiver,Y[[x]]$Sender)))
+	if(check == 0 & dim(Y[[1]])[2] == 4){
+		nn = sapply(1:lKK, function(x)length(unique(c(Y[[x]]$Receiver,Y[[x]]$Sender))))
+		nodenames = lapply(1:KK, function(x) unique(c(Y[[x]]$Receiver,Y[[x]]$Sender)))
 	}	}
 
     if(class(Y) != 'list'){
@@ -62,10 +68,12 @@ HLSMrandomEF = function(Y,edgeCov = NULL, receiverCov = NULL,senderCov =NULL,Ful
 
 ##prepare covariates#####
 #########################
+	noCOV = FALSE
 	if(!is.null(FullX) & !is.null(edgeCov) &!is.null(receiverCov) & !is.null(senderCov))(stop('FullX cannot be used when nodal or edge covariates are provided'))
 
 	if(is.null(FullX) & is.null(edgeCov) & is.null(receiverCov) & is.null(senderCov)){
 		X = lapply(1:KK,function(x) array(0, dim = c(nn[x],nn[x],1)))
+		noCOV = TRUE
 	}
 
 	if(is.null(FullX)){
@@ -150,18 +158,15 @@ HLSMrandomEF = function(Y,edgeCov = NULL, receiverCov = NULL,senderCov =NULL,Ful
   }
 ##starting values
     if(is.null(initialVals)){
-        Z0 = array(0, dim = c(sum(nn),dd))
-        cc = 1
+	Z0 = list()
         for(i in 1:KK){  
-            cc1 = (cc-1)+nn[i]
             ZZ = t(replicate(nn[i],rnorm(dd,0,sqrt(10))))
             ZZ[1,]=c(1,0)
             ZZ[2,2]=0
             if(ZZ[2,1] < ZZ[1,1]){
                 ZZ[2,1] = -1*(ZZ[2,1]-ZZ[1,1])+1}
             ZZ[3,2] = abs(ZZ[3,2])
-            Z0[cc:cc1,] = ZZ
-            cc = cc+nn[i]  
+            Z0[[i]] = ZZ 
         }
         Z0 = unlist(Z0)
         beta0 = replicate(KK,rnorm(PP,0,1))
@@ -228,7 +233,23 @@ HLSMrandomEF = function(Y,edgeCov = NULL, receiverCov = NULL,senderCov =NULL,Ful
 		niter = niter,PriorA = PriorA, PriorB = PriorB,intervention = intervention)
 
     rslt$call = match.call()
-    rslt$tune = list(tuneAlpha = tuneAlpha, tuneZ = tuneZ, tuneBeta = tuneBeta, tuneInt = tuneInt)	
+    if(noCOV == TRUE & intervention == 0){
+		rslt$tune = list(tuneZ = tuneZ, tuneInt = tuneInt)	
+		rslt$draws$Beta = NA
+		rslt$draws$Alpha = NA
+    }
+    if(noCOV == TRUE & intervention == 1){
+	    rslt$tune = list(tuneAlpha = tuneAlpha, tuneZ = tuneZ,tuneInt = tuneInt)
+	    rslt$draws$Beta = NA	
+	}
+    if(noCOV == FALSE & intervention == 0){
+	    rslt$tune = list(tuneBeta = tuneBeta, tuneZ = tuneZ,tuneInt = tuneInt)
+	    rslt$draws$Alpha = NA
+}
+    if(noCOV == FALSE & intervention == 1){
+	    rslt$tune = list(tuneBeta = tuneBeta,tuneAlpha=tuneAlpha,tuneZ = tuneZ,tuneInt = tuneInt)
+}
+
     class(rslt) = 'HLSM'
     rslt
 }

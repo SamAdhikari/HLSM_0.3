@@ -10,21 +10,21 @@
 \alias{getLikelihood}
 \alias{getBeta}
 
-\title{Function to run the MCMC sampler in random effect model (and HLSMfixedEF for fixed effect model)
+\title{Function to run the MCMC sampler in random effects model (and HLSMfixedEF for fixed effects model)
 }
 
 \description{
-    Function to run the MCMC sampler to draw from the posterior distribution of intercept, slopes, latent positions, and intervention effect (if applicable). HLSMrandomEF( ) fits randome effect model; HLSMfixedEF( ) fits fixed effect model. 
+    Function to run the MCMC sampler to draw from the posterior distribution of intercept, slopes, latent positions, and intervention effect (if applicable). HLSMrandomEF( ) fits random effects model; HLSMfixedEF( ) fits fixed effects model. 
 }
 
 \usage{
 
 HLSMrandomEF(Y,edgeCov=NULL, receiverCov = NULL, senderCov = NULL, 
-	FullX = NULL,initialVals = NULL, priors = NULL, tune = NULL,
-	tuneIn = TRUE,TT = NULL,dd, niter,intervention)
+        FullX = NULL,initialVals = NULL, priors = NULL, tune = NULL,
+        tuneIn = TRUE,TT = NULL,dd, niter,intervention)
 
 HLSMfixedEF(Y,edgeCov=NULL, receiverCov = NULL, senderCov = NULL,
-	FullX = NULL, initialVals = NULL, priors = NULL, tune = NULL,
+        FullX = NULL, initialVals = NULL, priors = NULL, tune = NULL,
         tuneIn = TRUE, TT = NULL,dd, niter,intervention)
 
 getBeta(object, burnin = 0, thin = 1)
@@ -37,27 +37,53 @@ getLikelihood(object, burnin = 0, thin = 1)
 
 \arguments{
 
-    \item{Y}{input outcome for different networks. Y can either be 
-		i.list of socio-matrix for \code{K} different networks
-		ii. list of data frame with columns \code{Sender}, \code{Receiver} and \code{Outcome} for \code{K} different networks
-		iii. a dataframe with columns \code{id} to identify network, \code{Receiver}, \code{Sender} and \code{Outcome} for receiver nodes, sender nodes and the edge outcome respectively       
+\item{Y}{
+	input outcome for different networks. Y can either be
+
+        (i). list of socio-matrix for \code{K} different networks
+
+        (ii). list of data frame with columns \code{Sender}, \code{Receiver} and \code{Outcome} for \code{K} different networks
+
+        (iii). a dataframe with columns named as follows: \code{id} to identify network, \code{Receiver} for receiver nodes, \code{Sender} for sender nodes and finally, \code{Outcome} for the edge outcome.       
 }
 
-	\item{edgeCov}{a data frame to specify edge level covariates with a column for network id named \code{id}, a column for sender node named \code{Sender}, a column for receiver nodes named \code{Receiver} and columns for values of each edge level covariates.
+\item{edgeCov}{
+	data frame to specify edge level covariates with
+
+        (i). a column for network id named \code{id}, 
+
+        (ii). a column for sender node named \code{Sender},
+
+        (iii). a column for receiver nodes named \code{Receiver}, and 
+
+        (iv). columns for values of each edge level covariates.
 }
 
-	\item{receiverCov}{a data frame to specify nodal covariates as edge receivers, with a column for network id, named \code{id}, a column \code{Node} for node names, and the rest for respective node level covariates.
+\item{receiverCov}{
+	a data frame to specify nodal covariates as edge receivers with
+
+        (i.) a column for network id named \code{id}, 
+
+        (ii.) a column \code{Node} for node names, and 
+
+        (iii). the rest for respective node level covariates.
 }
 
-	\item{senderCov}{a data frame to specify nodal covariates as edge senders, with a column for network id, named \code{id}, a column \code{Node} for node names, and the rest for respective node level covariates.
+\item{senderCov}{
+	a data frame to specify nodal covariates as edge senders with 
+
+        (i). a column for network id named \code{id}, 
+
+        (ii). a column \code{Node} for node names, and 
+
+        (iii). the rest for respective node level covariates.
 }
 
-	\item{FullX}{list of numeric arrays of dimension \code{n} by \code{n} by \code{p} of covariates for K different networks. When FullX is provided to the function, edgeCov, receiverCov and senderCov must be specified as NULL. 
+\item{FullX}{
+	list of numeric arrays of dimension \code{n} by \code{n} by \code{p} of covariates for K different networks. When FullX is provided to the function, edgeCov, receiverCov and senderCov must be specified as NULL. 
 }
 		
-
-
-    \item{initialVals}{
+\item{initialVals}{
 	an optional list of values to initialize the chain. If \code{NULL} default initialization is used, else 
 	\code{initialVals = list(ZZ, beta, intercept, alpha)}.
  
@@ -70,10 +96,10 @@ getLikelihood(object, burnin = 0, thin = 1)
 	\code{alpha} is a numeric variable and is 0 for no-intervention model.	
 }
 
-    \item{priors}{
-      an optional list to specify the hyper-parameters for the prior distribution of the paramters.
 
- If priors = \code{NULL}, default value is used. Else,
+\item{priors}{
+      an optional list to specify the hyper-parameters for the prior distribution of the paramters.
+        If priors = \code{NULL}, default value is used. Else,
 
     \code{priors=}
 
@@ -94,7 +120,8 @@ getLikelihood(object, burnin = 0, thin = 1)
     \code{PriorA, PriorB} is a numeric variable to indicate the rate and scale parameters for the inverse gamma prior distribution of the hyper parameter of variance of slope and intercept
        }
 
-    \item{tune}{
+
+\item{tune}{
     an optional list of tuning parameters for tuning the chain. If tune = \code{NULL}, default tuning is done. Else, 
 
 	\code{tune = list(tuneAlpha, tuneBeta, tuneInt,tuneZ)}.
@@ -107,33 +134,37 @@ getLikelihood(object, burnin = 0, thin = 1)
     a logical to indicate whether tuning is needed in the MCMC sampling. Default is \code{FALSE}.
 }
 
-    \item{TT}{
-     a vector of binaries to indicate treatmeant and control networks. If there is no intervention effect, TT = \code{NULL} (default).
+\item{TT}{
+     a vector of binaries to indicate treatment and control networks. If there is no intervention effect, TT = \code{NULL} (default).
 }
 
-    \item{dd}{
+
+\item{dd}{
     dimension of latent space.
 }
 
-    \item{niter}{
+\item{niter}{
     number of iterations for the MCMC chain.
 }
-    \item{intervention}{
+
+\item{intervention}{
     binary variable indicating whether the posterior distribution of the intervention effect is to be estimated.
 }
 
-    \item{object}{
+\item{object}{
 	object of class 'HLSM' returned by \code{HLSM()} or \code{HLSMfixedEF()}
 }
 
-    \item{burnin}{
-	numeric value to burn the chain while extracting results from the 'HLSM'object 
+\item{burnin}{
+	numeric value to burn the chain while extracting results from the 'HLSM'object. Default is \code{burnin = 0}. 
 }
 
-    \item{thin}{
-	numeric value by which the chain is to be thinned while extracting results from the 'HLSM' object 
+\item{thin}{
+	numeric value by which the chain is to be thinned while extracting results from the 'HLSM' object. Default is \code{thin = 1}. 
 } 
 }
+
+
 
 
 \value{
@@ -166,7 +197,7 @@ getLikelihood(object, burnin = 0, thin = 1)
 
 library(HLSM)
 
-#Set up the parameters of the function
+#Set values for the inputs of the function
 priors = NULL
 tune = NULL
 initialVals = NULL
@@ -183,10 +214,10 @@ summary(random.fit)
 names(random.fit)
 
 #extract results without burning and thinning
-getBeta(random.fit)
-getIntercept(random.fit)
-getLS(random.fit)
-getLikelihood(random.fit)
+Beta = getBeta(random.fit)
+Intercept = getIntercept(random.fit)
+LS = getLS(random.fit)
+Likelihood = getLikelihood(random.fit)
 
 ##Same can be done for fixed effect model
 

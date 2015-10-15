@@ -19,7 +19,7 @@ getReceiverCov = function(X,nnodes,nodenames){
 		x2 = which(dimnames(Xsm)[[2]] == 'Node')
 		for(kk in 1:length(KK)){
 			k1 = which(nodenames[[ii]] == KK[kk])
-			XX[[ii]][,k1,] = sapply(1:PP,function(x)rep(Xsm[which(Xsm$Node==KK[kk]),-c(x1,x2)][x],nnodes[ii]))
+			XX[[ii]][,k1,] = sapply(1:PP,function(x)rep(as.numeric(Xsm[which(Xsm$Node==KK[kk]),-c(x1,x2)][x]),nnodes[ii]))
 	}
 	}
 	return(XX)
@@ -43,7 +43,10 @@ getSenderCov = 	function(X,nnodes,nodenames){
 		x2 = which(dimnames(Xsm)[[2]] == 'Node')
 		for(kk in 1:length(KK)){
 			k1 = which(nodenames[[ii]] == KK[kk])
-			XX[[ii]][k1,,] = sapply(1:PP,function(x)rep(Xsm[which(Xsm$Node==KK[kk]),-c(x1,x2)][x],nnodes[ii]))
+			Xind = which(Xsm$Node==KK[kk])
+			for(ll in 1:PP){
+			    XX[[ii]][k1,,ll] = rep(as.numeric(Xsm[Xind,
+						-c(x1,x2)][ll]),nnodes[ii]) }
 	}
 	}
 	return(XX)

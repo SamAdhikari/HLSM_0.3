@@ -382,7 +382,7 @@ void sampleFixedIntervention(int *niter, double *XX,double *YY,double *ZZ,int *T
         double* D = 0;
 	D = new double[dd[0]];	
 //	double D[dd[0]];
-//	double C;
+	double C;
 	double muInt = MuBeta[PP[0]];
       	double sigmaInt = SigmaBeta[PP[0]];
 
@@ -458,13 +458,13 @@ void sampleFixedIntervention(int *niter, double *XX,double *YY,double *ZZ,int *T
 	}
 
     //Update varaince for ZZ    
-/*	
+	
 	for(int vv = 0; vv < dd[0]; vv++){	
 		D[vv] = D[vv]/2.0 + PriorB[0];
 		C = PriorA[0] + (sumAll)/2.0;
 		VarZ[vv] = 1.0/rgamma(C,1.0/D[vv]);
 	}
-*/	
+	
 	Zvar1[ii] = VarZ[0];
 	Zvar2[ii] = VarZ[1];
 	likelihood[ii] = llikall;
@@ -503,7 +503,7 @@ void sampleRandomIntervention(int *niter, double *XX,double *YY,double *ZZ,int *
 	double* D = 0;
 	D = new double[dd[0]];
 //	double D[dd[0]];
-//	double C;
+	double C;
 	for(int ii = 0; ii < niter[0]; ii++){
 		double muInt = MuBeta[PP[0]];
         	double sigmaInt = SigmaBeta[PP[0]];
@@ -635,14 +635,12 @@ void sampleRandomIntervention(int *niter, double *XX,double *YY,double *ZZ,int *
 	SigmaBeta[PP[0]] = 1.0/rgamma(A,1/B);	
 	postVar[ii+niter[0]*PP[0]] = SigmaBeta[PP[0]];
 
-	    //Update varaince for ZZ    
-	/*
+	    //Update varaince for ZZ    	
 	for(int vv = 0; vv < dd[0]; vv++){	
 		D[vv] = D[vv]/2.0 + PriorB[0];
 		C = PriorA[0] + (sumAll)/2.0;
 		VarZ[vv] = 1.0/rgamma(C,1.0/D[vv]);
-	}
-	*/
+	}	
 	Zvar1[ii] = VarZ[0];
 	Zvar2[ii] = VarZ[1];
 	likelihood[ii] = llikall;
