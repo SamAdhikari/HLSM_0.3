@@ -19,7 +19,8 @@
        ##tuneZ =  list( vec(len = nn[x]])) length of list = KK
 ##############################################################          
 #library(MASS)
-HLSMfixedEF= function(Y,edgeCov = NULL, receiverCov = NULL,senderCov =NULL,FullX = NULL, initialVals = NULL, priors = NULL, tune = NULL,
+HLSMfixedEF= function(Y,edgeCov = NULL, receiverCov = NULL,senderCov =NULL,
+                      FullX = NULL, initialVals = NULL, priors = NULL, tune = NULL,
         tuneIn = TRUE, TT = NULL,dd, niter,intervention)
 {
 
@@ -31,18 +32,12 @@ HLSMfixedEF= function(Y,edgeCov = NULL, receiverCov = NULL,senderCov =NULL,FullX
 	
     if(class(Y) == 'list'){ 
         KK = length(Y)
-	check = 1
-	for(cc in 1:KK){
-	    check =  check *(dim(Y[[cc]])[1] == dim(Y[[cc]])[2])
-	}
-	if(check == 1){	
-	    nn =sapply(1:KK,function(x) nrow(Y[[x]])) 
-	    nodenames = lapply(1:KK,function(x) dimnames(Y[[x]])[[1]])
-		}
+	if(dim(Y[[1]])[1] == dim(Y[[1]])[2]){
+		nn =sapply(1:length(Y),function(x) nrow(Y[[x]])) }
 
-	if(check == 0 & dim(Y[[1]])[2] == 4){
-		nn = sapply(1:lKK, function(x)length(unique(c(Y[[x]]$Receiver,Y[[x]]$Sender))))
-		nodenames = lapply(1:KK, function(x) unique(c(Y[[x]]$Receiver,Y[[x]]$Sender)))
+	if(dim(Y[[1]])[1] != dim(Y[[1]])[2] & dim(Y[[1]])[2] == 4){
+		nn = sapply(1:length(Y), function(x)length(unique(c(Y[[x]]$Receiver,Y[[x]]$Sender))))
+		nodenames = lapply(1:length(Y), function(x) unique(c(Y[[x]]$Receiver,Y[[x]]$Sender)))
 	}	}
 
     if(class(Y) != 'list'){
@@ -59,7 +54,7 @@ HLSMfixedEF= function(Y,edgeCov = NULL, receiverCov = NULL,senderCov =NULL,FullX
 			df.list[[k]] = array(0, dim = c(nn[k],nn[k]))
 			dimnames(df.list[[k]])[[1]] = dimnames(df.list[[k]])[[2]] = nodenames[[k]]
 			for(i in 1:dim(df.sm)[1]){
-				df.list[[k]][df.sm$Sender[i],df.sm$Receiver[i]] = df.sm$Outcome[i]  #assume undirected graph and missing items are zeros
+				df.list[[k]][paste(df.sm$Sender[i]),paste(df.sm$Receiver[i])] = df.sm$Outcome[i]  #assume undirected graph and missing items are zeros
 			}
 		}
 		Y = df.list 
@@ -159,18 +154,33 @@ HLSMfixedEF= function(Y,edgeCov = NULL, receiverCov = NULL,senderCov =NULL,FullX
 	PriorB = priors$PriorB
   }
 ##starting values
-    if(is.null(initialVals)){
-	Z0 = list()
-        for(i in 1:KK){  
-            ZZ = t(replicate(nn[i],rnorm(dd,0,1)))
-            ZZ[1,]=c(1,0)
-            ZZ[2,2]=0
-            if(ZZ[2,1] < ZZ[1,1]){
-                ZZ[2,1] = -1*(ZZ[2,1]-ZZ[1,1])+1}
-            ZZ[3,2] = abs(ZZ[3,2])
-	    Z0[[i]] = ZZ		 
-    }
-        Z0 = unlist(Z0)
+##
+    ##Procrustean transformation of latent positions
+    C = lapply(1:KK,function(tt){
+        diag(nn[tt]) - (1/nn[tt]) * array(1, dim = c(nn[tt],nn[tt]))})
+    Z0 = lapply(1:KK,function(tt){
+        g = graph.adjacency(Y[[tt]]);
+        ss = shortest.paths(g);
+        ss[ss > 4] = 4;
+        Z0 = cmdscale(ss,k = dd);
+        dimnames(Z0)[[1]] = dimnames(YY[[tt]])[[1]];
+        return(Z0)})	
+    Z00 = lapply(1:KK,function(tt)C[[tt]]%*%Z0[[tt]])
+    
+    
+    
+     if(is.null(initialVals)){
+# 	Z0 = list()
+#         for(i in 1:KK){  
+#             ZZ = t(replicate(nn[i],rnorm(dd,0,1)))
+#             ZZ[1,]=c(1,0)
+#             ZZ[2,2]=0
+#             if(ZZ[2,1] < ZZ[1,1]){
+#                 ZZ[2,1] = -1*(ZZ[2,1]-ZZ[1,1])+1}
+#             ZZ[3,2] = abs(ZZ[3,2])
+# 	    Z0[[i]] = ZZ		 
+#     }
+        Z0 = unlist(Z00)
         beta0 = rnorm(PP,0,1)
         intercept0  = rnorm(1, 0,1)
         if(intervention == 1){    alpha0=rnorm(1, 0, 1) }
@@ -237,6 +247,19 @@ HLSMfixedEF= function(Y,edgeCov = NULL, receiverCov = NULL,senderCov =NULL,FullX
 		MuBeta = MuBeta,SigmaBeta = VarBeta,MuZ = MuZ,VarZ = VarZ,tuneBetaAll = tuneBeta, tuneInt = tuneInt, 
 		tuneAlpha = tuneAlpha,tuneZAll = unlist(tuneZ),niter = niter,PriorA = PriorA, PriorB = PriorB, 
 		intervention = intervention)
+    
+    ##Procrutes transformation on the final draws of the latent positions
+    ##
+    Ztransformed = lapply(1:niter, function(ii) {lapply(1:KK,
+                                                        function(tt){z= rslt$draws$ZZ[[ii]][[tt]];
+                                                        z = C[[tt]]%*%z;
+                                                        pr = t(Z00[[tt]])%*% z;
+                                                        ssZ = svd(pr)
+                                                        tx = ssZ$v%*%t(ssZ$u)
+                                                        zfinal = z%*%tx
+                                                        return(zfinal)})})    
+    rslt$draws$ZZ = Ztransformed
+    
 
     rslt$call = match.call()
     if(noCOV == TRUE & intervention == 0){

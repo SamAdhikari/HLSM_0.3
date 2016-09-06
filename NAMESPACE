@@ -1,5 +1,5 @@
 useDynLib(HLSM)
-import("MASS", "coda")
+import("MASS", "coda", "igraph")
 
 export("HLSMrandomEF",
        "HLSMfixedEF",

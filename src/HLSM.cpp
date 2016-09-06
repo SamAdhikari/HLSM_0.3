@@ -200,7 +200,9 @@ void updateZ(double *XX,double *YY,double *ZZ,int *TT,int *nn, int *pp,int *dd,d
      for(int ss = 0 ; ss < nn[0]*dd[0] ; ss++){
          Znew[ss] = ZZ[ss];
     } 
-     for(int ii = 1 ; ii < nn[0] ; ii++){ //keep the first entry of Z fixed
+     for(int ii = 0 ; ii < nn[0] ; ii++){ //ii denotes row
+//note that if we were to use the constraints commented below
+// we will keep the first entry of Z fixed. ie start from ii = 1
 	      double* ZZsm = 0;
 	      ZZsm = new double[dd[0]];
 //	      double ZZsm[dd[0]];
@@ -209,21 +211,21 @@ void updateZ(double *XX,double *YY,double *ZZ,int *TT,int *nn, int *pp,int *dd,d
 	      double* ZnewSm = 0;
 	      ZnewSm = new double[dd[0]];
 //      	      double ZnewSm[dd[0]];
-      	      for(int kk = 0 ; kk < dd[0] ; kk++){ 
+      	      for(int kk = 0 ; kk < dd[0] ; kk++){ //kk denotes number of columns
 			  ZnewSm[kk]  = ZZsm[kk] + tuneZ[ii]*rnorm(0.0,1.0);
-			  if(ii == 1  && kk == 0){ //Positivity constraint on Znew[2,1]
-				  if(ZnewSm[kk] < Znew[0]){
-					  ZnewSm[kk] = -1.0*(ZnewSm[kk]-Znew[0])+1.0;
-				  }
-			  }
-			  if(ii == 1 && kk == 1){ //set Znew[2,2] = 0
-			      ZnewSm[kk] = 0.0;
-		          }
-                          if((kk == 1 && ii == 2)){ //Positivity constraint on Znew[3,2]
-		      		  if(ZnewSm[kk] < 0){
-		  			  ZnewSm[kk] = -1.0 * ZnewSm[kk];
-		      		  }
-			  }		
+// 			  if(ii == 1  && kk == 0){ //Positivity constraint on Znew[2,1]
+// 				  if(ZnewSm[kk] < Znew[0]){
+// 					  ZnewSm[kk] = -1.0*(ZnewSm[kk]-Znew[0])+1.0;
+// 				  }
+// 			  }
+// 			  if(ii == 1 && kk == 1){ //set Znew[2,2] = 0
+// 			      ZnewSm[kk] = 0.0;
+// 		          }
+//                           if((kk == 1 && ii == 2)){ //Positivity constraint on Znew[3,2]
+// 		      		  if(ZnewSm[kk] < 0){
+// 		  			  ZnewSm[kk] = -1.0 * ZnewSm[kk];
+// 		      		  }
+//			  }		
 	      	      }
 	      WriteRow(Znew, (ii), ZnewSm,nn,dd);
     	      FullLogLik(beta, YY, XX, Znew, alpha, TT, intercept,nn,pp,dd,&llNew);
@@ -382,7 +384,7 @@ void sampleFixedIntervention(int *niter, double *XX,double *YY,double *ZZ,int *T
         double* D = 0;
 	D = new double[dd[0]];	
 //	double D[dd[0]];
-	double C;
+//	double C;
 	double muInt = MuBeta[PP[0]];
       	double sigmaInt = SigmaBeta[PP[0]];
 
@@ -458,13 +460,13 @@ void sampleFixedIntervention(int *niter, double *XX,double *YY,double *ZZ,int *T
 	}
 
     //Update varaince for ZZ    
-	
+/*	
 	for(int vv = 0; vv < dd[0]; vv++){	
 		D[vv] = D[vv]/2.0 + PriorB[0];
 		C = PriorA[0] + (sumAll)/2.0;
 		VarZ[vv] = 1.0/rgamma(C,1.0/D[vv]);
 	}
-	
+*/	
 	Zvar1[ii] = VarZ[0];
 	Zvar2[ii] = VarZ[1];
 	likelihood[ii] = llikall;
@@ -503,7 +505,7 @@ void sampleRandomIntervention(int *niter, double *XX,double *YY,double *ZZ,int *
 	double* D = 0;
 	D = new double[dd[0]];
 //	double D[dd[0]];
-	double C;
+//	double C;
 	for(int ii = 0; ii < niter[0]; ii++){
 		double muInt = MuBeta[PP[0]];
         	double sigmaInt = SigmaBeta[PP[0]];
@@ -635,12 +637,14 @@ void sampleRandomIntervention(int *niter, double *XX,double *YY,double *ZZ,int *
 	SigmaBeta[PP[0]] = 1.0/rgamma(A,1/B);	
 	postVar[ii+niter[0]*PP[0]] = SigmaBeta[PP[0]];
 
-	    //Update varaince for ZZ    	
+	    //Update varaince for ZZ    
+	/*
 	for(int vv = 0; vv < dd[0]; vv++){	
 		D[vv] = D[vv]/2.0 + PriorB[0];
 		C = PriorA[0] + (sumAll)/2.0;
 		VarZ[vv] = 1.0/rgamma(C,1.0/D[vv]);
-	}	
+	}
+	*/
 	Zvar1[ii] = VarZ[0];
 	Zvar2[ii] = VarZ[1];
 	likelihood[ii] = llikall;
