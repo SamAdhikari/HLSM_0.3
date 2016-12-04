@@ -16,7 +16,7 @@
 	plotDiagnostic(chain)
 	plotHLSM.random.fit(fitted.model,parameter,burnin=0,thin=1)
 	plotHLSM.fixed.fit(fitted.model, parameter,burnin=0,thin=1)
-	plotHLSM.LS(fitted.model,burnin=0,thin=1,...)
+	plotHLSM.LS(fitted.model,pdfname=NULL,burnin=0,thin=1,...)
 }
 
 
@@ -25,7 +25,8 @@
 	\item{object}{object of class 'HLSM' obtained as an output from \code{HLSMrandomEF()} or \code{HLSMfixedEF()}
 }
 	\item{fitted.model}{model fit from either HLSMrandomEF() or HLSMfixedEF()}
-	\item{parameter}{parameter to plot; specified as \code{Beta} for slope coefficients, \code{Intercept} for intercept, and \code{Theta} for intervention effect}
+	\item{parameter}{parameter to plot; specified as \code{Beta} for slope coefficients, \code{Intercept} for intercept, and \code{Alpha} for intervention effect}
+	\item{pdfname}{character to specify the name of the pdf to save the plot if desired. Default is NULL}
         \item{burnin}{numeric value to burn the chain for plotting the results from the 'HLSM'object }
 	\item{thin}{a numeric thinning value}
 	\item{chain}{a numeric vector of posterior draws of parameter of interest.}

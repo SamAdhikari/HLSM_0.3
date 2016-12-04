@@ -19,14 +19,29 @@ MCMCfunction = function(nn,PP,KK,dd,XX,YY,ZZ,TT,beta,intercept,alpha,MuAlpha,Sig
     AlphaFinal = array(out[[28]],dim = c(niter,1) )
     ZZFinal = list()
     accZ = list()
-    n00 = n0 = 1
-    ZZx = array(out[[29]],dim = c(sum(nn),dd,niter))
-    for(kk in 1:KK){
+    ZZx = array(out[[29]],dim = c((sum(nn)*dd),niter))
+    for(ni in 1:niter ){
+	Zsm = list()
+        n00 = n0 = 1	
+    for(kk in 1:KK ){
         n1 = sum(nn[1:kk])
-        ZZFinal[[kk]] = array(ZZx[n00:n1,,],dim = c(nn[kk],dd,niter))
+        Zsm[[kk]] = array(ZZx[n0:(2*n1),ni],dim = c(nn[kk],dd))
         accZ[[kk]] = out[[26]][n00:(n1)]/(niter)
         n00 = (n1) + 1
+	n0 = (2*n1) + 1
 }
+	ZZFinal[[ni]] = Zsm
+}
+
+
+#    n00 = n0 = 1
+#    ZZx = array(out[[29]],dim = c(sum(nn),dd,niter))
+#    for(kk in 1:KK){
+#        n1 = sum(nn[1:kk])
+#        ZZFinal[[kk]] = array(ZZx[n00:n1,,],dim = c(nn[kk],dd,niter))
+#        accZ[[kk]] = out[[26]][n00:(n1)]/(niter)
+#        n00 = (n1) + 1
+#}
     InterceptFinal = array(out[[30]],dim=c(niter,KK) )
     Zvar1 = out[[31]]
     Zvar2 = out[[32]]

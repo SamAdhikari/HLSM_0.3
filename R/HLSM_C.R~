@@ -40,7 +40,7 @@ MCMCfunction = function(nn,PP,KK,dd,XX,YY,ZZ,TT,beta,intercept,alpha,MuAlpha,Sig
     draws = list(Intercept = InterceptFinal, Beta= betaFinal, Alpha = AlphaFinal, ZZ = ZZFinal, Zvar = Zvar,BetaMu = postMuBeta, VarMu = postVarBeta, likelihood = likelihood)
     accrate = list(intercept = accint, beta = accbeta, alpha = accalpha,Z=accZ)
 
-    return(list(draws = draws, acc = accrate,out=out)) 
+    return(list(draws = draws, acc = accrate)) 
   #  return(out)  
     rm(out)
 

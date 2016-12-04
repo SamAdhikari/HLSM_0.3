@@ -24,28 +24,14 @@ MCMCfixedEF = function(nn,PP,KK,dd,XX,YY,ZZ,TT,
 
     ZZFinal = list()
     accZ = list()
-    ZZx = array(out[[29]],dim = c((sum(nn)*dd),niter))
-    for(ni in 1:niter ){
-	Zsm = list()
-        n00 = n0 = 1	
+    n00 = n0 = 1
+    ZZx = array(out[[29]],dim = c(sum(nn),dd,niter))
     for(kk in 1:KK ){
         n1 = sum(nn[1:kk] )
-        Zsm[[kk]] = array(ZZx[n0:(2*n1),ni],dim = c(nn[kk],dd))
+        ZZFinal[[kk]] = array(ZZx[n00:n1,,],dim = c(nn[kk],dd,niter))
         accZ[[kk]] = out[[26]][n00:(n1)]/(niter)
         n00 = (n1) + 1
-	n0 = (2*n1) + 1
 }
-	ZZFinal[[ni]] = Zsm
-}
-
-#    n00 = n0 = 1
-#    ZZx = array(out[[29]],dim = c(sum(nn),dd,niter))
-#    for(kk in 1:KK ){
-#        n1 = sum(nn[1:kk] )
-#        ZZFinal[[kk]] = array(ZZx[n00:n1,,],dim = c(nn[kk],dd,niter))
-#        accZ[[kk]] = out[[26]][n00:(n1)]/(niter)
-#        n00 = (n1) + 1
-#}
     
     Zvar1 = out[[31]]
     Zvar2 = out[[32]]

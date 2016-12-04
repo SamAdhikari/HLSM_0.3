@@ -1,5 +1,9 @@
 useDynLib(HLSM)
 import("MASS", "coda", "igraph")
+importFrom("grDevices", "dev.new", "dev.off", "pdf")
+importFrom("graphics", "layout", "par", "plot", "rect", "segments",
+             "text")
+importFrom("stats", "cmdscale", "quantile", "rnorm", "sd")
 
 export("HLSMrandomEF",
        "HLSMfixedEF",
@@ -8,9 +12,6 @@ export("HLSMrandomEF",
        "plotHLSM.random.fit",
        "plotHLSM.fixed.fit",
        "plotHLSM.LS",	
-       "print.HLSM",
-       "print.summary.HLSM",
-       "summary.HLSM",
 	"getBeta",
 	"getIntercept",
 	"getAlpha",

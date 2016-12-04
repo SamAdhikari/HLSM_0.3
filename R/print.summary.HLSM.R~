@@ -1,7 +1,13 @@
 print.summary.HLSM = function(x,...){
-    cat("Call:\n")
+    message("Call:\n")
     print(x$call)
-    cat("\n")
-    print(x$acc)
+    message("\n Estimated Intercept:\n")
+    print(x$est.intercept)
+    if(!is.na(x$est.slopes)){
+    message("\n Estimated Slopes:\n")
+    print(x$est.slopes) }
+    if(!is.na(x$est.alpha)){
+    message("\n Estimated Intervention Effect:\n")
+    print(x$est.alpha) }
 }
 

@@ -70,14 +70,14 @@ plotHLSM.random.fit=function(fitted.model, parameter, burnin = 0, thin = 1){
 			segments((x-0.15), int.quantiles[,3], (x+0.15), int.quantiles[,3], lwd=2, col=colors[1])
     }
 	
-	if(parameter=="Theta"){
+	if(parameter=="Alpha"){
 		chain=getAlpha(fitted.model, burnin=burnin,thin=thin)
 		x=1
 		int.quantiles=matrix(NA, 1,5)
 	        int.quantiles=quantile(chain, probs=c(0.025, 0.25, 0.5, 0.75, 0.975))
 		plot(x, int.quantiles[3], pch=".",  ylim=c(min(int.quantiles),
 			max(int.quantiles)), col="white", xlab="Treatment Effect",
-			 ylab=expression(theta), main=expression(theta))
+			 ylab=expression(alpha), main=expression(alpha))
 		rect((x-0.05), int.quantiles[1], (x+0.05), int.quantiles[5], col=colors[3], border=NA)
 		rect((x-0.15), int.quantiles[2], (x+0.15), int.quantiles[4], col=colors[2], border=NA)
 		segments((x-0.15), int.quantiles[3], (x+0.15), int.quantiles[3], lwd=2, col=colors[1])
@@ -125,14 +125,14 @@ plotHLSM.fixed.fit=function(fitted.model, parameter, burnin =0, thin = 1){
 		segments((x-0.15), int.quantiles[3], (x+0.15), int.quantiles[3], lwd=2, col=colors[1])
     }
 
-	if(parameter=="Theta"){
+	if(parameter=="Alpha"){
 		chain=getAlpha(fitted.model,burnin=burnin,thin=thin)
 		x=1
 		int.quantiles=matrix(NA, 1,5)
 		int.quantiles=quantile(chain, probs=c(0.025, 0.25, 0.5, 0.75, 0.975))
 		plot(x, int.quantiles[3], pch=".", lab=c(1,5,7), 
 			ylim=c(min(int.quantiles), max(int.quantiles)), col="white",
-			xlab="Treatment Effect", ylab=expression(theta), main=expression(theta))
+			xlab="Treatment Effect", ylab=expression(alpha), main=expression(alpha))
 		rect((x-0.05), int.quantiles[1], (x+0.05), int.quantiles[5], col=colors[3], border=NA)
 		rect((x-0.15), int.quantiles[2], (x+0.15), int.quantiles[4], col=colors[2], border=NA)
 		segments((x-0.15), int.quantiles[3], (x+0.15), int.quantiles[3], lwd=2, col=colors[1])
@@ -154,18 +154,23 @@ plotLS = function(LS,xx,fitted.model, node.name = FALSE,nodenames = NULL){
 	}
 }
 
-plotHLSM.LS = function(fitted.model,burnin=0,thin=1,...){
+plotHLSM.LS = function(fitted.model,pdfname = NULL,burnin=0,thin=1,...){
 	if(class(fitted.model)!='HLSM'){
 		stop('fitted.model must be of class HLSM')}
 #	niter = length(fitted.model$draws$Alpha)
 #	if(is.null(burnin)){burnin=0.1*niter}
 #	if(is.null(thin)){thin = round(0.9*niter/200)}
 	LS = getLS(fitted.model,burnin=burnin, thin=thin)
-
-	mat = matrix(1:length(LS),ceiling(length(LS)/5),5,byrow = TRUE)
-	dev.new(height = 10,width = 10)
-	layout(mat,widths = rep.int(1.5,ncol(mat)), heights = rep.int(1,nrow(mat)))
+	if(!is.null(pdfname)){pdf(file=paste(pdfname,'.pdf',sep=''))}else(dev.new(height = 10,width = 10))
+	if(length(LS) > 5){
+		mat = matrix(1:length(LS),ceiling(length(LS)/5),5,byrow = TRUE)
+		layout(mat,widths = rep.int(2.5,ncol(mat)), heights = rep.int(1,nrow(mat)))
+	}else{
+		x1 = ceiling(length(LS)/2)
+		par(mfrow = c(2,x1))
+	}
 	lapply(1:length(LS),function(x) plotLS(LS,x,fitted.model,...))
+	if(!is.null(pdfname))dev.off()
 }
 
 
